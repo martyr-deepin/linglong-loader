@@ -133,7 +133,7 @@ std::string run_exec(const std::string &cmd) {
     return result;
 }
 
-int main() {
+int main(int argc, char **argv) {
 //    auto user_home = std::getenv("HOME");
 //    auto user_name = std::getenv("USER");
     auto exec_path = std::filesystem::canonical("/proc/self/exe");
@@ -187,11 +187,19 @@ int main() {
             exit(-1);
         }
 
-        char *load_argv[] = {
+        int c = 1;
+        char *load_argv[16] = {
                 loader_path.data(),
                 mount_point,
-                nullptr,
         };
+        if (argc > 1 && argc < 16) {
+            for (auto idx = 1; idx < argc; idx++) {
+                c++;
+                load_argv[c] = argv[idx];
+            }
+        }
+        c++;
+        load_argv[c] = nullptr;
         extern char **environ;
         // run loader shell
         auto ret = execve(loader_path.data(), load_argv, environ);
