@@ -18,7 +18,7 @@ strip bin/uloader
 
 # 制作 data.sqsfs
 mkdir work && cp .loader
-mksquashfs work/* data.sqsfs -comp xz
+mksquashfs work/.loader work/* data.sqsfs -comp xz
 cat bin/uloader data.sqsfs > appid_version_arch.uap
 chmod -x appid_version_arch.uap
 ```
