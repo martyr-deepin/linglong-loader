@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
 
     run_exec(cmd);
     std::string loader_path = mount_point;
-    loader_path += "/.loader";
+    loader_path += "/loader";
     if (!std::filesystem::exists(loader_path)) {
         cout << "can not run!" << endl;
         exit(-1);
