@@ -1,16 +1,16 @@
 Source: linglong-loader
 Section: admin
 Priority: optional
-Maintainer: Deepin Packages Builder <packages@deepin.com>
+Maintainer: Deepin Packages Builder <packages@deepin.org>
 Build-Depends:
  debhelper (>= 11),
  cmake,
- build-essential
+ libgtest-dev
 Standards-Version: 4.1.3
-Homepage: http://www.deepin.org
+Homepage: https://www.deepin.org
 
 Package: linglong-loader
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Package loader for UAB. 
+Description: Package loader for removable bundle.
  Package loader...
