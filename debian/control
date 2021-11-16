@@ -11,6 +11,6 @@ Homepage: https://www.deepin.org
 
 Package: linglong-loader
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, squashfuse, fuse
 Description: Package loader for removable bundle.
  Package loader...
