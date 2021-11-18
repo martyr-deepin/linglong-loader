@@ -1,1 +1,2 @@
 linglong-loader: statically-linked-binary usr/libexec/linglong-loader
+linglong-loader: embedded-library usr/libexec/linglong-loader: zlib

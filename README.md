@@ -2,35 +2,60 @@
 
 Linglong Loader
 
-## Getting started
+## Build
 
 ```bash
-sudo apt install squashfuse fuse -y
-mkdir build && cd build 
-cmake .. && make -j1
-
-# 建议 
-strip bin/uloader
-
-# 生成 loader
-
-# python3 scripts/create_uap.py  #构造 一个启动shell
-
-# 制作 data.sqsfs
-mkdir work && cp loader
-mksquashfs work/loader work/* data.sqsfs -comp xz
-cat bin/uloader data.sqsfs > appid_version_arch.uap
-chmod -x appid_version_arch.uap
+sudo apt install -y libsquashfuse-dev  liblz4-dev liblzma-dev liblzo2-dev
+mkdir build && cd build
+cmake .. && make -j
 ```
-## Default Loader
 
-cat loader
+## Test
+
 ```bash
-#!/bin/bash
-echo "This Default Loader"
-echo $@
-./demo-test
+## cd ${project_build_root}
+strip bin/linglong-loader
+
+rm demo.uab
+rm data.sqsfs
+rm data
+
+mkdir data
+echo '#!/bin/bash' > data/loader
+echo 'echo This Default Loader' >> data/loader
+echo "echo $@" >> data/loader
+chmod +x data/loader
+
+mksquashfs data/* data.sqsfs -comp xz
+
+cat bin/linglong-loader data.sqsfs > demo.uab
+
+chmod +x demo.uab
+
+./demo.uab
 ```
-第一个参数默认是挂载的路径，后续的参数是启动是携带的参数
+
+## Getting help
+
+Any usage issues can ask for help via
+
+- [Gitter](https://gitter.im/orgs/linuxdeepin/rooms)
+- [IRC channel](https://webchat.freenode.net/?channels=deepin)
+- [Forum](https://bbs.deepin.org)
+- [WiKi](https://wiki.deepin.org/)
+
+## Getting involved
+
+We encourage you to report issues and contribute changes
+
+- [Contribution guide for developers](https://github.com/linuxdeepin/developer-center/wiki/Contribution-Guidelines-for-Developers-en)
+  . (English)
+- [开发者代码贡献指南](https://github.com/linuxdeepin/developer-center/wiki/Contribution-Guidelines-for-Developers) (中文)
+
 ## License
-GPLv3
+
+This project is licensed under [GPLv3]().
+
+```
+
+```
