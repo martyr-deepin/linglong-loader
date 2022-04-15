@@ -12,7 +12,8 @@ Build-Depends:
  libgtest-dev,
  libfuse-dev,
  pkg-config,
- zlib1g-dev
+ zlib1g-dev,
+ libzstd-dev
 Standards-Version: 4.1.3
 Homepage: https://www.deepin.org
 

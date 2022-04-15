@@ -25,6 +25,7 @@ set(LINK_LIBS squashfuse_ll
     fuse
     stdc++
     pthread
+    zstd
     dl)
 
 target_link_libraries(${EXENAME} ${LINK_LIBS})
