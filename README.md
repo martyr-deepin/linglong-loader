@@ -35,6 +35,18 @@ chmod +x demo.uab
 ./demo.uab
 ```
 
+# 代码覆盖率测试
+add --coverage in CMakeLists.txt
+```bash
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+```
+
+use gcov、lcov to generate convert html report, make shure at the top level of the project
+```bash
+./code_coverage.sh
+```
+
 ## Getting help
 
 Any usage issues can ask for help via
