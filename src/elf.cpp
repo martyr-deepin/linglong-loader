@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <elf.h>
@@ -60,23 +61,57 @@ uint64_t file64_to_cpu(uint64_t val, const P &ehdr)
 
 auto read_elf64(FILE *fd, Elf64_Ehdr &ehdr) -> decltype(ehdr.e_shoff + (ehdr.e_shentsize * ehdr.e_shnum))
 {
-    Elf64_Ehdr ehdr64;
     off_t ret = -1;
 
     fseeko(fd, 0, SEEK_SET);
-    ret = fread(&ehdr64, 1, sizeof(ehdr64), fd);
-    if (ret < 0 || (size_t)ret != sizeof(ehdr64)) {
+    // read ELF header
+    if (fread(&ehdr, 1, sizeof ehdr, fd) != sizeof(ehdr)) {
         return -1;
     }
 
-    ehdr.e_shoff = file64_to_cpu<Elf64_Ehdr>(ehdr64.e_shoff, ehdr);
-    ehdr.e_shentsize = file16_to_cpu<Elf64_Ehdr>(ehdr64.e_shentsize, ehdr);
-    ehdr.e_shnum = file16_to_cpu<Elf64_Ehdr>(ehdr64.e_shnum, ehdr);
+    ehdr.e_shoff = file64_to_cpu(ehdr.e_shoff, ehdr);
+    ehdr.e_shstrndx = file16_to_cpu(ehdr.e_shstrndx, ehdr);
+    ehdr.e_shnum = file16_to_cpu(ehdr.e_shnum, ehdr);
 
-    return (ehdr.e_shoff + (ehdr.e_shentsize * ehdr.e_shnum));
+    Elf64_Shdr shdr;
+
+    // read section name string table
+    // first, read its header
+    fseek(fd, ehdr.e_shoff + ehdr.e_shstrndx * sizeof shdr, SEEK_SET);
+    if (fread(&shdr, 1, sizeof shdr, fd) != sizeof(shdr)) {
+        return -1;
+    }
+
+    // next, read the section, string data
+    char *sh = (char *)malloc(shdr.sh_size);
+
+    do {
+        fseek(fd, shdr.sh_offset, SEEK_SET);
+        if (fread(sh, 1, shdr.sh_size, fd) != shdr.sh_size) {
+            break;
+        }
+
+        // read all section headers
+        for (int idx = 0; idx < ehdr.e_shnum; idx++) {
+            fseek(fd, ehdr.e_shoff + idx * sizeof(shdr), SEEK_SET);
+            if (fread(&shdr, 1, sizeof(shdr), fd) != sizeof(shdr)) {
+                break;
+            }
+
+            shdr.sh_name = file32_to_cpu(shdr.sh_name, ehdr);
+            shdr.sh_offset = file32_to_cpu(shdr.sh_offset, ehdr);
+
+            if (strcmp(sh + shdr.sh_name, ".bundle") == 0) {
+                ret = shdr.sh_offset;
+                break;
+            }
+        }
+    } while (false);
+    free(sh);
+    return ret;
 }
 
-long GetELFSize(const std::string &path)
+off_t get_bundle_offset(const std::string &path)
 {
     FILE *fd;
     off_t size = -1;

@@ -32,7 +32,7 @@ set(GTEST_SOURCES
 
 add_executable(demo-test ${GTEST_SOURCES})
 
-target_link_libraries(demo-test PRIVATE ${LINK_LIBS} ${Qt_LIBS})
+target_link_libraries(demo-test PRIVATE erofsfuse ${LINK_LIBS} ${Qt_LIBS} )
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 

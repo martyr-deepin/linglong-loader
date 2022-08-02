@@ -8,16 +8,19 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 add_executable(${EXENAME}
                elf.cpp
-               squashfs.cpp
+               erofs.cpp
                main.cpp)
 
 link_libraries("-static")
 
 target_include_directories(${EXENAME} PRIVATE)
 
-set(LINK_LIBS squashfuse_ll
-    squashfuse
-    fuseprivate
+set(LINK_LIBS
+    selinux
+    sepol
+    pcre2-8
+    erofs
+    erofsfuse
     lz4
     lzma
     lzo2
@@ -28,6 +31,6 @@ set(LINK_LIBS squashfuse_ll
     zstd
     dl)
 
-target_link_libraries(${EXENAME} ${LINK_LIBS})
+target_link_libraries(${EXENAME} erofsfuse ${LINK_LIBS} )
 
 install(TARGETS linglong-loader RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/libexec)

@@ -22,15 +22,15 @@ namespace linglong {
 
 namespace elf {
 
-int GetELFSize(const std::string &path);
+off_t get_bundle_offset(const std::string &path);
 
 }
 
-namespace squashfs {
+namespace erofs {
 
 int MountFile(const std::string &path, size_t offset, const std::string &mount_point);
 
-} // namespace squashfs
+} // namespace erofs
 
 } // namespace linglong
 
@@ -49,16 +49,10 @@ int main(int argc, char **argv)
     }
 
     // get elf size
-    auto elf_size = elf::GetELFSize(exec_path);
+    auto bundle_offset = elf::get_bundle_offset(exec_path);
 
-    struct stat elf_stat {
-    };
-
-    if (stat(exec_path.c_str(), &elf_stat) != 0) {
-        exit(-1);
-    }
-    if (elf_size >= elf_stat.st_size) {
-        cout << "loader can not run for single!" << endl;
+    if (bundle_offset == -1) {
+        cerr << "failed to find bundle" << endl;
         return EXIT_FAILURE;
     }
 
@@ -66,7 +60,7 @@ int main(int argc, char **argv)
     char temp_prefix[1024] = "/tmp/uab-XXXXXX";
     char *mount_point = mkdtemp(temp_prefix);
 
-    squashfs::MountFile(exec_path, elf_size, mount_point);
+    erofs::MountFile(exec_path, bundle_offset, mount_point);
 
     std::string loader_path = mount_point;
     loader_path += "/loader";
