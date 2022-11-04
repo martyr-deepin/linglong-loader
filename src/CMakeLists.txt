@@ -15,10 +15,13 @@ link_libraries("-static")
 
 target_include_directories(${EXENAME} PRIVATE)
 
+find_package (PkgConfig REQUIRED)
+
+pkg_check_modules (SELINUX REQUIRED libselinux)
+
 set(LINK_LIBS
-    selinux
-    sepol
-    pcre2-8
+    ${SELINUX_STATIC_LIBRARIES}
+    pthread
     erofs
     erofsfuse
     lz4
@@ -27,7 +30,6 @@ set(LINK_LIBS
     z
     fuse
     stdc++
-    pthread
     zstd
     dl)
 
