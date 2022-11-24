@@ -1,19 +1,16 @@
 /*
- * Copyright (c) 2022. Uniontech Software Ltd. All rights reserved.
+ * SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
  *
- * Author:     liujianqiang <liujianqiang@uniontech.com>
- *
- * Maintainer: liujianqiang <liujianqiang@uniontech.com>
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
 #include <iostream>
 
 #include <gtest/gtest.h>
+
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 #include <QProcess>
 
 namespace linglong::squashfs {

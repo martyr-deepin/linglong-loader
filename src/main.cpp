@@ -1,22 +1,18 @@
 /*
- * Copyright (c) 2021. Uniontech Software Ltd. All rights reserved.
+ * SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
  *
- * Author:     Heysion <heysoin@deepin.com>
- *
- * Maintainer: Heysion <heysion@deepin.com>
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
-#include <unistd.h>
+#include <pthread.h>
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <sys/prctl.h>
-#include <pthread.h>
+#include <unistd.h>
 
-#include <iostream>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
 
 namespace linglong {
 
