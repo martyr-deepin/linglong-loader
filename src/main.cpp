@@ -8,10 +8,10 @@
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <limits.h>
 #include <unistd.h>
 
 #include <cstdlib>
-#include <filesystem>
 #include <iostream>
 
 namespace linglong {
@@ -33,13 +33,30 @@ int MountFile(const std::string &path, size_t offset, const std::string &mount_p
 using namespace std;
 using namespace linglong;
 
+std::string realpath(const std::string &path)
+{
+    char *p = new char[PATH_MAX];
+    auto ret = ::realpath(path.c_str(), p);
+    if (ret != p) {
+        cerr << "realpath failed:" << errno;
+    }
+    std::string res = ret;
+    delete[] p;
+    return res;
+}
+
+bool exists(const std::string &path)
+{
+    return access(path.c_str(), F_OK) == 0;
+}
+
 int main(int argc, char **argv)
 {
     prctl(PR_SET_PDEATHSIG, SIGKILL);
 
-    auto exec_path = std::filesystem::canonical("/proc/self/exe");
+    auto exec_path = realpath("/proc/self/exe");
 
-    if (!filesystem::exists(exec_path)) {
+    if (!exists(exec_path)) {
         cerr << "load failed! " << exec_path << endl;
         return EXIT_FAILURE;
     }
@@ -60,7 +77,7 @@ int main(int argc, char **argv)
 
     std::string loader_path = mount_point;
     loader_path += "/loader";
-    if (!std::filesystem::exists(loader_path)) {
+    if (!exists(loader_path)) {
         cerr << "can not found" << loader_path << endl;
         return EXIT_FAILURE;
     }
@@ -81,7 +98,7 @@ int main(int argc, char **argv)
         int c = 1;
         // FIXME, user ARG_MAX
         char *load_argv[16] = {
-            loader_path.data(),
+            (char *)loader_path.data(),
             mount_point,
         };
         if (argc > 1 && argc < 16) {
