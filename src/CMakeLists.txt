@@ -6,18 +6,15 @@ set(EXENAME "linglong-loader")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_executable(${EXENAME}
-               elf.cpp
-               erofs.cpp
-               main.cpp)
+add_executable(${EXENAME} elf.cpp erofs.cpp main.cpp)
 
 link_libraries("-static")
 
 target_include_directories(${EXENAME} PRIVATE)
 
-find_package (PkgConfig REQUIRED)
+find_package(PkgConfig REQUIRED)
 
-pkg_check_modules (SELINUX REQUIRED libselinux)
+pkg_check_modules(SELINUX REQUIRED libselinux)
 
 set(LINK_LIBS
     ${SELINUX_STATIC_LIBRARIES}
@@ -33,6 +30,7 @@ set(LINK_LIBS
     zstd
     dl)
 
-target_link_libraries(${EXENAME} erofsfuse ${LINK_LIBS} )
+target_link_libraries(${EXENAME} erofsfuse ${LINK_LIBS})
 
-install(TARGETS linglong-loader RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/libexec)
+install(TARGETS linglong-loader
+        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/libexec)
