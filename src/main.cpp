@@ -30,18 +30,15 @@ int MountFile(const std::string &path, size_t offset, const std::string &mount_p
 
 } // namespace linglong
 
-using namespace std;
-using namespace linglong;
-
 std::string realpath(const std::string &path)
 {
-    char *p = new char[PATH_MAX];
-    auto ret = ::realpath(path.c_str(), p);
-    if (ret != p) {
-        cerr << "realpath failed:" << errno;
+    char *buffer = new char[PATH_MAX];
+    auto ret = ::realpath(path.c_str(), buffer);
+    if (ret != buffer) {
+        std::cerr << "realpath failed:" << errno;
     }
     std::string res = ret;
-    delete[] p;
+    delete[] buffer;
     return res;
 }
 
@@ -57,15 +54,15 @@ int main(int argc, char **argv)
     auto exec_path = realpath("/proc/self/exe");
 
     if (!exists(exec_path)) {
-        cerr << "load failed! " << exec_path << endl;
+        std::cerr << "load failed! " << exec_path << std::endl;
         return EXIT_FAILURE;
     }
 
     // get elf size
-    auto bundle_offset = elf::get_bundle_offset(exec_path);
+    auto bundle_offset = linglong::elf::get_bundle_offset(exec_path);
 
     if (bundle_offset == -1) {
-        cerr << "failed to find bundle" << endl;
+        std::cerr << "failed to find bundle" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -73,29 +70,29 @@ int main(int argc, char **argv)
     char temp_prefix[1024] = "/tmp/uab-XXXXXX";
     char *mount_point = mkdtemp(temp_prefix);
 
-    erofs::MountFile(exec_path, bundle_offset, mount_point);
+    linglong::erofs::MountFile(exec_path, bundle_offset, mount_point);
 
     std::string loader_path = mount_point;
     loader_path += "/loader";
     if (!exists(loader_path)) {
-        cerr << "can not found" << loader_path << endl;
+        std::cerr << "can not found" << loader_path << std::endl;
         return EXIT_FAILURE;
     }
 
     auto pid = fork();
     if (pid < 0) {
-        cerr << "fork exec failed:" << errno << endl;
+        std::cerr << "fork exec failed:" << errno << std::endl;
         return EXIT_FAILURE;
     }
 
     // run loader for child
     if (pid == 0) {
         if (chdir(mount_point) != 0) {
-            cerr << "change to work failed !" << errno << endl;
+            std::cerr << "change to work failed !" << errno << std::endl;
             return EXIT_FAILURE;
         }
 
-        int c = 1;
+        int cnt = 1;
         // FIXME, user ARG_MAX
         char *load_argv[16] = {
             (char *)loader_path.data(),
@@ -103,17 +100,17 @@ int main(int argc, char **argv)
         };
         if (argc > 1 && argc < 16) {
             for (auto idx = 1; idx < argc; idx++) {
-                c++;
-                load_argv[c] = argv[idx];
+                cnt++;
+                load_argv[cnt] = argv[idx];
             }
         }
-        c++;
-        load_argv[c] = nullptr;
+        cnt++;
+        load_argv[cnt] = nullptr;
         extern char **environ;
         // run loader shell
         auto ret = execve(loader_path.data(), load_argv, environ);
         if (ret != 0) {
-            cerr << "run failed!" << endl;
+            std::cerr << "run failed!" << std::endl;
         }
         exit(0);
     }
@@ -124,7 +121,7 @@ int main(int argc, char **argv)
             // std::cout << "wait " << childPid << " exit" << endl;
         }
         if (childPid < 0) {
-            std::cout << "all child exit" << endl;
+            std::cout << "all child exit" << std::endl;
             return EXIT_SUCCESS;
         }
     }
